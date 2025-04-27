@@ -5,6 +5,11 @@ import { useEffect, useState } from 'react';
 export default function ProdiPage() {
     
     const [prodis, setProdis] = useState([]);
+    const [kode, setKode] = useState('');
+    const [nama, setNama] = useState('');
+    const [kepala, setKepala] = useState('');
+    const [msg, setMsg] = useState('');
+    const [formVisible, setFormVisible] = useState(false);
 
     const fetchProdis = async () => {
         const res = await fetch('/api/prodi');
@@ -16,8 +21,70 @@ export default function ProdiPage() {
         fetchProdis();
     }, []);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch('/api/prodi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kode, nama, kepala })
+        });
+
+        if (res.ok) {
+            setMsg('Berhasil disimpan!');
+            setKode('');
+            setNama('');
+            setKepala('');
+            setFormVisible(false);
+            fetchProdis(); // refresh data
+        } else {
+            setMsg('Gagal menyimpan data');
+        }
+    };
+
     return (
         <div>
+            <button
+                onClick={() => setFormVisible(!formVisible)}>
+                {formVisible ? 'Tutup Form' : 'Tambah Matkul'}
+            </button>
+            {formVisible && (
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <input 
+                            type='text'
+                            value={kode}
+                            onChange={(e) => setKode(e.target.value)}
+                            placeholder='Masukkan Kode'
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type='text'
+                            value={nama}
+                            onChange={(e) => setNama(e.target.value)}
+                            placeholder='Masukkan Nama Prodi'
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type='text'
+                            value={kepala}
+                            onChange={(e) => setKepala(e.target.value)}
+                            placeholder='Masukkan Nama Kepala Prodi'
+                            required
+                        />
+                    </div>
+                    <button type="submit">
+                        Simpan
+                    </button>
+                    <p>{msg}</p>
+                </form>
+            )}
+
+            <br></br>
+
             <table border='1'>
                 <thead>
                     <tr>

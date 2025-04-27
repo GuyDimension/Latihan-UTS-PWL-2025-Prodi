@@ -7,3 +7,19 @@ export async function GET() {
 
     return new Response(JSON.stringify(data), {status: 200});
 }
+
+export async function POST(request) {
+    const { kode, nama, kepala } = await request.json();
+
+    if (!kode || !nama || !kepala) {
+        return new Response(JSON.stringify({ error: 'Semua kolom wajib terisi' }), 
+        {status: 400}
+        );
+    }
+
+    const prodi = await prisma.prodi.create({
+        data: { kode, nama, kepala },
+    });
+
+    return new Response(JSON.stringify(prodi), {status: 201});
+}
